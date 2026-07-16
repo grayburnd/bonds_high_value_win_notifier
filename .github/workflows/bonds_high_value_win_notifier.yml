@@ -26,8 +26,8 @@ jobs:
       - name: Run Python
         id: run_python
         env:
-          PB_VAL_OF_BOND: "25000"
-          PB_DATE_OF_PURCHASE: "2024-02-26"
+          PB_VAL_OF_BOND: "50000"
+          PB_DATE_OF_PURCHASE: "2021-09-11"
           PB_AREA: "london"
         run: python main.py
       - name: Upload Results Artifact
@@ -49,8 +49,6 @@ jobs:
         if: ${{ env.create_artifact == 'True' }}
         with:
           name: winnings-results #${{ env.results_path }}
-      - name: list /tmp
-        run: ls /tmp
       - name: Send mail
         uses: dawidd6/action-send-mail@v18
         with:
@@ -68,7 +66,7 @@ jobs:
           
           from: ${{ vars.MAIL_FROM }}
 
-          attachments: ${{ env.results_path }}
+          attachments: ${{ env.results_path || '[]' }}
           
           body: |
            The results are in from this months Premium bonds high value earnings results!!
