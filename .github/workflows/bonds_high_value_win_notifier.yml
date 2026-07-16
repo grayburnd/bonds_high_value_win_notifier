@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       results_path: ${{ steps.run_python.outputs.RESULTS_PATH }}
+      message: ${{ steps.run_python.outputs.MESSAGE }}
     steps:
       - uses: actions/checkout@v7
       - name: Set up Python ${{ env.python-version }}
@@ -38,6 +39,7 @@ jobs:
     needs: build_execute
     runs-on: ubuntu-latest
     env:
+      message: ${{ needs.build_execute.outputs.message }}
       results_path: ${{ needs.build_execute.outputs.results_path }}
     steps:
       - uses: actions/download-artifact@v7
@@ -65,6 +67,6 @@ jobs:
           attachments: ${{ env.results_path }}
           
           body: |
-           The results are in from this months Premium bonds high value earnings results!! 
+           The results are in from this months Premium bonds high value earnings results!!
 
-           See the attachment below...
+           ${{ env.message }}
