@@ -66,7 +66,7 @@ def check_winnings():
         winning_matches_results: list[dict[str, str]] = [holding for holding in csv_dict_reader if holding["val_of_bond"] == pb_val_of_bond and holding["area"] in area_matches and holding["dt_of_pur"] == pb_date_of_purchase]
 
         if winning_matches_results:
-            message = f"Congratulations, you have {len(winning_matches_results)} potentially matching wins!\nYou can find the details pretty printed in the zip file below!"
+            message = f"Congratulations, you have {len(winning_matches_results)} potentially matching wins!"
             print(message)
             # time.sleep(3)
             pretty_printed_result = json.dumps(winning_matches_results, indent=2)
