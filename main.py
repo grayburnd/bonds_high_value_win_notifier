@@ -82,8 +82,8 @@ def check_winnings():
             zip_file_name: str = "results.zip"
             with zipfile.ZipFile(zip_file_name, mode="w" ) as zip_file:
                 zip_file.write(results_path)
-            if "GITHUB_OUTPUT" in os.environ:
-                with open(os.environ["GITHUB_OUTPUT"], "a") as file:
+            if os.getenv("GITHUB_OUTPUT") != None:
+                with open(os.getenv("GITHUB_OUTPUT"), "a") as file:
                     file.write(f"RESULTS_PATH={zip_file_name}\n")
                     file.write(f"MESSAGE={message}\n")
                     file.write(f"CREATE_ARTIFACT=True\n")
@@ -91,8 +91,8 @@ def check_winnings():
         else:
             message = f"Unfortunately, there are no matches for you this month!"
             print(message)
-            if "GITHUB_OUTPUT" in os.environ:
-                with open(os.environ["GITHUB_OUTPUT"], "a") as file:
+            if os.getenv("GITHUB_OUTPUT") != None:
+                with open(os.getenv("GITHUB_OUTPUT"), "a") as file:
                     file.write(f"MESSAGE={message}\n")
 
 def cleanup():
