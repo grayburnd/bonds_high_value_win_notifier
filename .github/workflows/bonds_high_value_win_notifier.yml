@@ -9,6 +9,7 @@ jobs:
     outputs:
       results_path: ${{ steps.run_python.outputs.RESULTS_PATH }}
       message: ${{ steps.run_python.outputs.MESSAGE }}
+      create_artifact: ${{ steps.run_python.outputs.CREATE_ARTIFACT }}
     steps:
       - uses: actions/checkout@v7
       - name: Set up Python ${{ env.python-version }}
@@ -30,6 +31,7 @@ jobs:
           PB_AREA: "london"
         run: python main.py
       - name: Upload Results Artifact
+        if: ${{ steps.run_python.outputs.CREATE_ARTIFACT == 'True' }}
         uses: actions/upload-artifact@v7
         with:
           name: winnings-results
@@ -41,8 +43,10 @@ jobs:
     env:
       message: ${{ needs.build_execute.outputs.message }}
       results_path: ${{ needs.build_execute.outputs.results_path }}
+      create_artifact: ${{ needs.build_execute.outputs.create_artifact }}
     steps:
       - uses: actions/download-artifact@v7
+        if: ${{ env.create_artifact == 'True' }}
         with:
           name: winnings-results #${{ env.results_path }}
       - name: list /tmp

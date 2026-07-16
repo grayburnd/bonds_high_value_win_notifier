@@ -81,6 +81,7 @@ def check_winnings():
                 with open(os.environ["GITHUB_OUTPUT"], "a") as file:
                     file.write(f"RESULTS_PATH={zip_file_name}\n")
                     file.write(f"MESSAGE={message}\n")
+                    file.write(f"CREATE_ARTIFACT=True\n")
 
         else:
             message = f"Unfortunately, there are no matches for you this month!"
