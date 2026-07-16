@@ -33,7 +33,6 @@ jobs:
         with:
           name: winnings-results
           path: ${{ steps.run_python.outputs.RESULTS_PATH }}
-          archive: false
 
   notify_if_win:
     needs: build_execute
@@ -44,6 +43,7 @@ jobs:
       - uses: actions/download-artifact@v7
         with:
           name: winnings-results #${{ env.results_path }}
+          path: /tmp
       - name: Send mail
         uses: dawidd6/action-send-mail@v18
         with:
