@@ -1,4 +1,4 @@
-import datetime, time, requests, io, tempfile, csv, difflib, os, json
+import datetime, time, requests, io, tempfile, csv, difflib, os, json, zipfile
 import pandas as pd
 from pathlib import Path
 
@@ -73,10 +73,12 @@ def check_winnings():
             with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", suffix=".json", delete=False) as temp_file:
                 temp_file.write(pretty_printed_result)
                 results_path = Path(temp_file.name)
-                print(results_path)
+            zip_file_name: str = "results.zip"
+            with zipfile.ZipFile(zip_file_name, mode="w" ) as zip_file:
+                zip_file.write(results_path)
             if "GITHUB_OUTPUT" in os.environ:
                 with open(os.environ["GITHUB_OUTPUT"], "a") as file:
-                    file.write(f"RESULTS_PATH={results_path}\n")
+                    file.write(f"RESULTS_PATH={zip_file_name}\n")
 
         else:
             print(f"Unfortunately, there are no matches for you this month!")
