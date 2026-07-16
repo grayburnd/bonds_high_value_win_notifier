@@ -31,6 +31,7 @@ jobs:
         with:
           name: winnings-results
           path: ${{ steps.run_python.outputs.RESULTS_PATH }}
+          archive: false
 
   notify_if_win:
     needs: build_execute
@@ -63,5 +64,5 @@ jobs:
           
           body: |
            The results are in from this months Premium bonds high value earnings results!! 
-           
+
            See the attachment below...
