@@ -2,6 +2,9 @@ import datetime, time, requests, io, tempfile, csv, difflib, os, json, zipfile
 import pandas as pd
 from pathlib import Path
 
+##TODO: 
+## - Put in logging at various levels, controlled by env vars
+
 def create_temp_file():
     with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", suffix=".xlsx", delete=False) as temp_file:
         global path
@@ -22,6 +25,8 @@ def get_bonds():
 
     try:
         response = requests.get(excel_url, timeout=10) ##Add stream=True to handle large files
+        ##TODO: 
+        ## - Put in retry logic with jitter in case of 503 errors
         response.raise_for_status()
         raw_bytes = response.content ##response.iter_content() can be used to fetch the content in chunks
         excel_data = io.BytesIO(raw_bytes)
