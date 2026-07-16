@@ -26,9 +26,9 @@ jobs:
       - name: Run Python
         id: run_python
         env:
-          PB_VAL_OF_BOND: "50000"
-          PB_DATE_OF_PURCHASE: "2021-09-11"
-          PB_AREA: "london"
+          PB_VAL_OF_BOND: ${{ vars.PB_VAL_OF_BOND }}
+          PB_DATE_OF_PURCHASE: ${{ vars.PB_DATE_OF_PURCHASE }}
+          PB_AREA: ${{ vars.PB_AREA }}
         run: python main.py
       - name: Upload Results Artifact
         if: ${{ steps.run_python.outputs.CREATE_ARTIFACT == 'True' }}
