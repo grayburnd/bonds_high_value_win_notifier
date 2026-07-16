@@ -1,6 +1,9 @@
 name: bonds_high_value_win_notifier
 # run-name: ${{ github.actor }} is learning GitHub Actions
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+  schedule:
+     - cron: "0 8 1 * *"
 env:
   python-version: 3.14
 jobs:
