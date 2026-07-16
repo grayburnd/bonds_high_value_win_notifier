@@ -1,5 +1,5 @@
-name: learn-github-actions
-run-name: ${{ github.actor }} is learning GitHub Actions
+name: bonds_high_value_win_notifier
+# run-name: ${{ github.actor }} is learning GitHub Actions
 on: workflow_dispatch
 env:
   python-version: 3.14
