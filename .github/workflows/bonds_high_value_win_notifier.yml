@@ -6,6 +6,8 @@ env:
 jobs:
   build_execute:
     runs-on: ubuntu-latest
+    outputs:
+      results_path: ${{ steps.run_python.outputs.RESULTS_PATH }}
     steps:
       - uses: actions/checkout@v7
       - name: Set up Python ${{ env.python-version }}
@@ -37,12 +39,11 @@ jobs:
     needs: build_execute
     runs-on: ubuntu-latest
     env:
-      winnings_results_path: tmp/winnings-results.json
+      results_path: ${{ needs.build_execute.outputs.results_path }}
     steps:
       - uses: actions/download-artifact@v7
         with:
-          name: winnings-results
-          path: ${{ env.winnings_results_path }}
+          name: ${{ env.results_path }}
       - name: Send mail
         uses: dawidd6/action-send-mail@v18
         with:
@@ -60,7 +61,7 @@ jobs:
           
           from: ${{ vars.MAIL_FROM }}
 
-          attachments: ${{ env.winnings_results_path }}
+          attachments: ${{ env.results_path }}
           
           body: |
            The results are in from this months Premium bonds high value earnings results!! 
