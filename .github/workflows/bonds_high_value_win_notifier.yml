@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v7
         with:
-          name: ${{ env.results_path }}
+          name: winnings-results #${{ env.results_path }}
       - name: Send mail
         uses: dawidd6/action-send-mail@v18
         with:
