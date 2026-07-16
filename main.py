@@ -69,12 +69,14 @@ def check_winnings():
             print(f"Congratulations, you have {len(winning_matches_results)} potentially matching wins!\nYou can find the details pretty printed below...")
             # time.sleep(3)
             pretty_printed_result = json.dumps(winning_matches_results, indent=2)
-            raw_json_result = json.dumps(winning_matches_results)
             print(pretty_printed_result)
+            with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", suffix=".json", delete=False) as temp_file:
+                temp_file.write(pretty_printed_result)
+                results_path = Path(temp_file.name)
+                print(results_path)
             if "GITHUB_OUTPUT" in os.environ:
                 with open(os.environ["GITHUB_OUTPUT"], "a") as file:
-                    file.write(f"SEND_EMAIL=True\n")
-                    file.write(f"RAW_JSON_RESULT={raw_json_result}\n")
+                    file.write(f"RESULTS_PATH={results_path}\n")
 
         else:
             print(f"Unfortunately, there are no matches for you this month!")

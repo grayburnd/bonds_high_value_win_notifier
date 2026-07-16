@@ -6,9 +6,6 @@ env:
 jobs:
   build_execute:
     runs-on: ubuntu-latest
-    outputs:
-      send_email: ${{ steps.run_python.outputs.SEND_EMAIL }} ## If Python skips or crashes, these evaluate to '' safely
-      raw_json_result: ${{ steps.run_python.outputs.RAW_JSON_RESULT }} ## If Python skips or crashes, these evaluate to '' safely
     steps:
       - uses: actions/checkout@v7
       - name: Set up Python ${{ env.python-version }}
@@ -29,42 +26,42 @@ jobs:
           PB_DATE_OF_PURCHASE: "2024-02-26"
           PB_AREA: "london"
         run: python main.py
+      - name: Upload Results Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: winnings-results
+          path: ${{ steps.run_python.outputs.RESULTS_PATH }}
 
-  test_json_format:
+  notify_if_win:
     needs: build_execute
     runs-on: ubuntu-latest
     env:
-      SEND_EMAIL: ${{ needs.build_execute.outputs.send_email || 'False' }}
-      RAW_JSON_RESULT: ${{ needs.build_execute.outputs.raw_json_result || '[{}]' }}
+      winnings_results_path: tmp/winnings-results.json
     steps:
-      - name: print json for testing
-        run:  echo "${{ toJSON(env.RAW_JSON_RESULT) }}"
+      - uses: actions/download-artifact@v7
+        with:
+          name: winnings-results
+          path: ${{ env.winnings_results_path }}
+      - name: Send mail
+        uses: dawidd6/action-send-mail@v18
+        with:
+          # MailerSend Server Specifications
+          server_address: ${{ vars.MAIL_ADDRESS }}
+          server_port: 587
+          
+          # Authentication fetched securely from Actions Secrets
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          
+          # Email Routing Information
+          subject: "High Value Winnings Filter Results"
+          to: ${{ vars.MAIL_TO }} 
+          
+          from: ${{ vars.MAIL_FROM }}
 
-  # notify_if_win:
-  #   if: needs.build_execute.outputs.send_email == 'True'
-  #   needs: build_execute
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     SEND_EMAIL: ${{ needs.build_execute.outputs.send_email || 'False' }}
-  #     RAW_JSON_RESULT: ${{ needs.build_execute.outputs.raw_json_result || '[{}]' }}
-  #   steps:
-  #     - name: Send mail
-  #       uses: dawidd6/action-send-mail@v18
-  #       with:
-  #         # MailerSend Server Specifications
-  #         server_address: ${{ vars.MAIL_ADDRESS }}
-  #         server_port: 587
+          attachments: ${{ env.winnings_results_path }}
           
-  #         # Authentication fetched securely from Actions Secrets
-  #         username: ${{ secrets.MAIL_USERNAME }}
-  #         password: ${{ secrets.MAIL_PASSWORD }}
-          
-  #         # Email Routing Information
-  #         subject: "High Value Winnings Filter Results"
-  #         to: ${{ vars.MAIL_TO }} 
-          
-  #         from: ${{ vars.MAIL_FROM }}
-          
-  #         body: |
-  #          The results are in from this months Premium bonds high value earnings results. 
-  #          ${{ toJSON(env.RAW_JSON_RESULT) }}
+          body: |
+           The results are in from this months Premium bonds high value earnings results!! 
+           
+           See the attachment below...
