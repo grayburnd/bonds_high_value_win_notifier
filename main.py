@@ -74,7 +74,7 @@ def check_winnings():
             if "GITHUB_OUTPUT" in os.environ:
                 with open(os.environ["GITHUB_OUTPUT"], "a") as file:
                     file.write(f"SEND_EMAIL=True\n")
-                    file.write(f"PRETTY_PRINTED_RESULT={raw_json_result}\n")
+                    file.write(f"RAW_JSON_RESULT={raw_json_result}\n")
 
         else:
             print(f"Unfortunately, there are no matches for you this month!")
