@@ -29,8 +29,9 @@ jobs:
           PB_DATE_OF_PURCHASE: "2024-02-26"
           PB_AREA: "london"
         run: python main.py
+
   notify_if_win:
-    if: needs.build_execute.outputs.send_email == 'False'
+    if: needs.build_execute.outputs.send_email == 'True'
     needs: build_execute
     runs-on: ubuntu-latest
     env:

@@ -47,18 +47,18 @@ def check_winnings():
         csv_dict_reader = csv.DictReader(file)
         raw_area_codes: list[str] = [row["area"] for row in csv_dict_reader]
         unique_area_codes = set(raw_area_codes)
-        time.sleep(3)
+        # time.sleep(3)
 
         print(f"Resolved Value for PB_AREA: {pb_area}\nResolved Value for PB_DATE_OF_PURCHASE: {pb_date_of_purchase}\nResolved Value for PB_VAL_OF_BOND: {pb_val_of_bond}")
-        time.sleep(3)
+        # time.sleep(3)
 
         print(f"Finding the closest matching area codes as per your PB_AREA environment variable: {os.getenv("PB_AREA")}...")
-        time.sleep(5)
+        # time.sleep(5)
 
         try:
             area_matches: list[str] = difflib.get_close_matches(pb_area, unique_area_codes, n=3, cutoff=0.6) #type: ignore #Returns 3 since London has 3 sections for example so will check date, amount for all of them
             print(f"The closest matching area codes as per your PB_AREA environment variable are: {area_matches}")
-            time.sleep(3)
+            # time.sleep(3)
         except TypeError as err:
             raise TypeError(f"The environment variable PB_AREA must be a str. Got {os.getenv("PB_AREA")}")
         
@@ -67,11 +67,14 @@ def check_winnings():
 
         if winning_matches_results:
             print(f"Congratulations, you have {len(winning_matches_results)} potentially matching wins!\nYou can find the details pretty printed below...")
-            time.sleep(3)
+            # time.sleep(3)
             pretty_printed_result = json.dumps(winning_matches_results, indent=2)
             raw_json_result = json.dumps(winning_matches_results)
             print(pretty_printed_result)
             if "GITHUB_OUTPUT" in os.environ:
+                with open(os.environ["GITHUB_OUTPUT"], "a") as file:
+                    file.write(f"SEND_EMAIL=True")
+                    file.write(f"PRETTY_PRINTED_RESULT={raw_json_result}")
                 with open(os.environ["GITHUB_OUTPUT"], "a") as file:
                     file.write(f"SEND_EMAIL=True")
                     file.write(f"PRETTY_PRINTED_RESULT={raw_json_result}")
@@ -83,7 +86,7 @@ def cleanup():
     if path.exists():
         time.sleep(3)
         print(f"{path} exists hence deleting...") ##Should be in logs instead
-        time.sleep(3)
+        # time.sleep(3)
         path.unlink()
         print(f"Does {path} exist? {path.exists()}\nCleanup finished!") ##Should be in logs instead
 
