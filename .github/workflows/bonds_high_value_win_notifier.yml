@@ -48,7 +48,7 @@ jobs:
       - uses: actions/download-artifact@v7
         if: ${{ env.create_artifact == 'True' }}
         with:
-          name: winnings-results #${{ env.results_path }}
+          name: winnings-results
       - name: Send mail
         uses: dawidd6/action-send-mail@v18
         with:
@@ -61,7 +61,7 @@ jobs:
           password: ${{ secrets.MAIL_PASSWORD }}
           
           # Email Routing Information
-          subject: "High Value Winnings Filter Results"
+          subject: "Premium Bonds: High Value Winnings Filter Results"
           to: ${{ vars.MAIL_TO }} 
           
           from: ${{ vars.MAIL_FROM }}
