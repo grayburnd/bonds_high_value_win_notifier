@@ -44,6 +44,8 @@ jobs:
         with:
           name: winnings-results #${{ env.results_path }}
           path: /tmp
+      - name: list /tmp
+        run: ls /tmp
       - name: Send mail
         uses: dawidd6/action-send-mail@v18
         with:
