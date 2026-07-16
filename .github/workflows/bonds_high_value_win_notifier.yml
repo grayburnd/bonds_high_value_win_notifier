@@ -43,7 +43,6 @@ jobs:
       - uses: actions/download-artifact@v7
         with:
           name: winnings-results #${{ env.results_path }}
-          path: /tmp
       - name: list /tmp
         run: ls /tmp
       - name: Send mail
