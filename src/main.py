@@ -32,8 +32,8 @@ def main():
     processed_data_frame = process_data_frame(data_frame)
     convert_to_csv(processed_data_frame, path)
     area_matches = init_winnings_check(path, area, purchase_date, bond_value)
-    check_if_winner(area_matches, path, area, purchase_date, bond_value)
-    cleanup(path)
+    results_path = check_if_winner(area_matches, path, area, purchase_date, bond_value)
+    cleanup(path, results_path)
 
 def env_vars_init(area_code: str | None, date_of_purchase: str | None, val_of_bond: str | None) -> tuple[str | None, str | None, str | None]:
     if area_code is None or date_of_purchase is None or val_of_bond is None:
@@ -155,7 +155,7 @@ def init_winnings_check(path: Path, area: str | None, purchase_date: str | None,
 
 ###
 
-def check_if_winner(area_matches: list[str], path: Path, area: str | None, purchase_date: str | None, bond_value: str | None) -> bool:
+def check_if_winner(area_matches: list[str], path: Path, area: str | None, purchase_date: str | None, bond_value: str | None) -> Path | None:
 
     with open(path, mode="r", encoding="utf-8") as file:
         csv_dict_reader = csv.DictReader(file)
@@ -169,11 +169,11 @@ def check_if_winner(area_matches: list[str], path: Path, area: str | None, purch
             message = f"Congratulations, you have {len(winning_matches_results)} potentially matching wins!"
             logger.info(message)
             pretty_printed_result = json.dumps(winning_matches_results, indent=2)
-            with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", suffix=".json", delete=False) as temp_file:
-                temp_file.write(pretty_printed_result)
-                results_path = Path(temp_file.name)
 
             if os.getenv("GITHUB_OUTPUT") is not None: ##GitHub stores the environment variable for us on GitHub runners
+                with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", suffix=".json", delete=False) as temp_file:
+                    temp_file.write(pretty_printed_result)
+                    results_path = Path(temp_file.name)
                 zip_file_name: str = "results.zip" ##Used in GitHub actions workflow
                 with zipfile.ZipFile(zip_file_name, mode="w" ) as zip_file:
                     zip_file.write(results_path)
@@ -181,6 +181,7 @@ def check_if_winner(area_matches: list[str], path: Path, area: str | None, purch
                     file.write(f"RESULTS_PATH={zip_file_name}\n")
                     file.write(f"MESSAGE={message}\n")
                     file.write(f"CREATE_ARTIFACT=True\n")
+                    return results_path
 
         else:
             message = f"Unfortunately, there are no matches for you this month!"
@@ -189,14 +190,15 @@ def check_if_winner(area_matches: list[str], path: Path, area: str | None, purch
                 with open(os.environ["GITHUB_OUTPUT"], "a") as file:
                     file.write(f"MESSAGE={message}\n")
 
-def cleanup(path: Path, results_path: Path):
+def cleanup(path: Path, results_path: Path | None):
     ##Cleanup
     for temp_file in [path, results_path]:
-        if temp_file.exists():
-            logger.info(f"{temp_file} exists hence deleting...") ##Should be in logs instead
-            temp_file.unlink()
-            logger.info(f"Cleanup finished!") ##Should be in logs instead
-            assert not temp_file.exists(), f"File {temp_file.name} still exists"
+        if temp_file is not None:
+            if temp_file.exists():
+                logger.info(f"{temp_file} exists hence deleting...") ##Should be in logs instead
+                temp_file.unlink()
+                logger.info(f"Cleanup finished!") ##Should be in logs instead
+                assert not temp_file.exists(), f"File {temp_file.name} still exists"
 
 if __name__ == "__main__":
     main()
