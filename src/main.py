@@ -66,9 +66,9 @@ def get_file(max_retries: int =3):
     year: int = datetime.date.today().year
     excel_url: str = f"https://www.nsandi.com/files/asset/xlsx/prize-{months_dict[month]}-{year}.xlsx" ##insert current month dynamically
     logger.info(f"Attempting to download {months_dict[month]}s Premium Bond winngs sheet...")
+    delay: int = 1
     for attempt in range(1, max_retries + 1):
         logger.info(f"Attempt {attempt} / {max_retries}")
-        delay: int = 1
         try:
             response = requests.get(excel_url, timeout=10)
             response.raise_for_status() ##Raise any HTTP Errors as exceptions
