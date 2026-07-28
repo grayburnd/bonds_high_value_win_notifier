@@ -173,10 +173,6 @@ def check_if_winner(area_matches: list[str], path: Path, area: str | None, purch
                 temp_file.write(pretty_printed_result)
                 results_path = Path(temp_file.name)
 
-            zip_file_name: str = "results.zip" ##Used in GitHub actions workflow
-            with zipfile.ZipFile(zip_file_name, mode="w" ) as zip_file:
-                zip_file.write(results_path)
-
             if os.getenv("GITHUB_OUTPUT") is not None: ##GitHub stores the environment variable for us on GitHub runners
                 zip_file_name: str = "results.zip" ##Used in GitHub actions workflow
                 with zipfile.ZipFile(zip_file_name, mode="w" ) as zip_file:
