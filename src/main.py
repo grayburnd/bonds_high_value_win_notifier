@@ -37,7 +37,7 @@ def main():
 
 def env_vars_init(area_code: str | None, date_of_purchase: str | None, val_of_bond: str | None) -> tuple[str | None, str | None, str | None]:
     if area_code is None or date_of_purchase is None or val_of_bond is None:
-        msg = f"One of the required environment variables is not set. Got... PB_AREA: {os.getenv("PB_AREA")}, PB_DATE_OF_PURCHASE: {os.getenv("PB_DATE_OF_PURCHASE")}, PB_VAL_OF_BOND: {os.getenv("PB_VAL_OF_BOND")}"
+        msg = f"One of the required environment variables is not set. Got... PB_AREA: {area_code}, PB_DATE_OF_PURCHASE: {date_of_purchase}, PB_VAL_OF_BOND: {val_of_bond}"
         logger.critical(msg)
         raise ValueError(msg)
     pb_area = area_code
@@ -139,7 +139,7 @@ def init_winnings_check(path: Path, area: str | None, purchase_date: str | None,
 
         unique_area_codes: set[str] = set(raw_area_codes)
 
-        logger.info(f"Finding the closest matching area codes as per PB_AREA environment variable: {os.environ['PB_AREA']}...")
+        logger.info(f"Finding the closest matching area codes as per PB_AREA environment variable: {area}...")
 
         area = str(area).lower().replace("  ", " ").replace(" ", "_").strip() ##Normalize pb_area due to string alphabetic nature
 
@@ -147,7 +147,7 @@ def init_winnings_check(path: Path, area: str | None, purchase_date: str | None,
         logger.info(f"The closest matching area codes as per your PB_AREA environment variable are: {area_matches}")
         
         if not area_matches:
-            msg = f"There were no matches for the provided area code: {os.environ['PB_AREA']}...\nChange your area code to a style that matches the below and try again...\n{random.sample(list(unique_area_codes), 7)}"
+            msg = f"There were no matches for the provided area code: {area}...\nChange your area code to a style that matches the below and try again...\n{random.sample(list(unique_area_codes), 7)}"
             logger.critical(msg)
             raise KeyError(msg)
         
