@@ -189,13 +189,14 @@ def check_if_winner(area_matches: list[str], path: Path, area: str | None, purch
                 with open(os.environ["GITHUB_OUTPUT"], "a") as file:
                     file.write(f"MESSAGE={message}\n")
 
-def cleanup(path: Path):
+def cleanup(path: Path, results_path: Path):
     ##Cleanup
-    if path.exists():
-        logger.info(f"{path} exists hence deleting...") ##Should be in logs instead
-        path.unlink()
-        logger.info(f"Cleanup finished!") ##Should be in logs instead
-    assert not path.exists(), f"File {path.name} still exists"
+    for temp_file in [path, results_path]:
+        if temp_file.exists():
+            logger.info(f"{temp_file} exists hence deleting...") ##Should be in logs instead
+            temp_file.unlink()
+            logger.info(f"Cleanup finished!") ##Should be in logs instead
+            assert not temp_file.exists(), f"File {temp_file.name} still exists"
 
 if __name__ == "__main__":
     main()
