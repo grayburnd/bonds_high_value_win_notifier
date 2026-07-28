@@ -27,12 +27,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Run Python
-        id: run_python
+        id: run_python ##Needed for referebce capabilities
         env:
           PB_VAL_OF_BOND: ${{ vars.PB_VAL_OF_BOND }}
           PB_DATE_OF_PURCHASE: ${{ vars.PB_DATE_OF_PURCHASE }}
           PB_AREA: ${{ vars.PB_AREA }}
-        run: python main.py
+          LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+        run: python src/main.py
       - name: Upload Results Artifact
         if: ${{ steps.run_python.outputs.CREATE_ARTIFACT == 'True' }}
         uses: actions/upload-artifact@v7
@@ -45,8 +46,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       message: ${{ needs.build_execute.outputs.message }}
-      results_path: ${{ needs.build_execute.outputs.results_path }}
-      create_artifact: ${{ needs.build_execute.outputs.create_artifact }}
+      results_path: ${{ needs.build_execute.outputs.results_path }} ##Defaults to False if Upload Results Artifact is not ran, as per condition for RESULTS_PATH
+      create_artifact: ${{ needs.build_execute.outputs.create_artifact }} ##Defaults to False if Upload Results Artifact is not ran, as per condition for CREATE_ARTIFACT
     steps:
       - uses: actions/download-artifact@v7
         if: ${{ env.create_artifact == 'True' }}
@@ -55,23 +56,25 @@ jobs:
       - name: Send mail
         uses: dawidd6/action-send-mail@v18
         with:
-          # MailerSend Server Specifications
+          # MailerSend Server specs
           server_address: ${{ vars.MAIL_ADDRESS }}
-          server_port: 587
+          server_port: ${{ vars.SERVER_PORT }}
           
-          # Authentication fetched securely from Actions Secrets
+          # Authentication
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
           
-          # Email Routing Information
-          subject: "Premium Bonds: High Value Winnings Filter Results"
+          ## Email Routing Info
+          subject: "Premium Bonds: High Value Winnings Monthly Filter Results"
           to: ${{ vars.MAIL_TO }} 
-          
           from: ${{ vars.MAIL_FROM }}
 
+          ## Attachments - Defaults to empty in case results path is Falsey
           attachments: ${{ env.results_path || '[]' }}
           
-          body: |
+          ##Message Body
+
+          body: | ##Multi-Line string reminder
            The results are in from this months Premium bonds high value earnings results!!
 
            ${{ env.message }}
