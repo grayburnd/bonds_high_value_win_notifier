@@ -1,0 +1,13 @@
+[project]
+name = "bonds_high_value_win_notifier" ##Allows pip install bonds_high_value_win_notifier
+version = "0.1.0"
+
+[tool.pytest.ini_options]
+addopts = "-rA -s -v"
+markers = [
+    "fast: quick unit tests",
+    "slow: take a long time to run",
+    "api: hit the API",
+    "smoke: quick to run and check basic, critical functionality",
+    "unregistered: used for testing pytest functionality"
+]
