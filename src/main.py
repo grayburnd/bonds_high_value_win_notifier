@@ -59,7 +59,7 @@ def create_temp_file():
 ## Downloading premium Bonds Winning Sheet
 def get_file(max_retries: int =3):
     months_dict: dict[int, str] = {
-    1: "january", 2: "february", 3: "march", 4: "may", 5: "april", 6: "june",
+    1: "january", 2: "february", 3: "march", 4: "april", 5: "may", 6: "june",
     7: "july", 8: "august", 9: "september", 10: "october", 11: "november", 12: "december"
     }
     month: int = datetime.date.today().month
