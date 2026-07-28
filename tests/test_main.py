@@ -9,7 +9,7 @@ import pytest
 from src.main import (create_data_frame, create_temp_file, env_vars_init,
                       init_winnings_check, process_data_frame)
 
-valid_mock_env_vars = {
+winning_mock_env_vars = {
     "area": "london",
     "purchase_date": "2024-02-26",
     "bond_value": "25000"
@@ -77,10 +77,10 @@ def test_init_winnings_check_raises_with_missing_area():
     absolute_path = (Path(__file__).parent / mock_data_csv_file_name).resolve()
     print(f"path is {absolute_path.name}")
     with pytest.raises(KeyError):
-        init_winnings_check(absolute_path, "non-existent-area", valid_mock_env_vars["purchase_date"], valid_mock_env_vars["bond_value"])
+        init_winnings_check(absolute_path, "non-existent-area", winning_mock_env_vars["purchase_date"], winning_mock_env_vars["bond_value"])
 
 def test_init_winnings_check_raises_with_correct_area():
     absolute_path = (Path(__file__).parent / mock_data_csv_file_name).resolve()
-    result = init_winnings_check(absolute_path, valid_mock_env_vars["area"], valid_mock_env_vars["purchase_date"], valid_mock_env_vars["bond_value"])
+    result = init_winnings_check(absolute_path, winning_mock_env_vars["area"], winning_mock_env_vars["purchase_date"], winning_mock_env_vars["bond_value"])
     assert result
     
