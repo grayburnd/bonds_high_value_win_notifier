@@ -1,16 +1,18 @@
 import io
 import logging
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch, Mock
 
 import pandas as pd
 import pytest
+import requests
 
 from src.main import (
     create_data_frame,
     create_temp_file,
     env_vars_init,
     init_winnings_check,
+    get_file,
     process_data_frame,
 )
 
@@ -32,16 +34,19 @@ def disable_logging():
     logging.disable(logging.NOTSET)
 
 
+@pytest.mark.unit
 def test_missing_env_vars_as_none():
     with pytest.raises(ValueError):
         env_vars_init(None, None, None)
 
 
+@pytest.mark.unit
 def test_temp_file_exists():
     path = create_temp_file()
     assert path.exists() is True
 
 
+@pytest.mark.unit
 def get_empty_excel_bytes() -> bytes:
     buffer = io.BytesIO()
     data = [
@@ -55,6 +60,36 @@ def get_empty_excel_bytes() -> bytes:
     return buffer.getvalue()
 
 
+@pytest.mark.resilience
+@patch(
+    "src.main.requests.get"
+)  ##Intercept requests and mock it and its attributes
+@pytest.mark.parametrize(
+    "side_effect, status_code, exception",
+    [
+        (
+            requests.exceptions.ConnectionError,
+            403,
+            requests.exceptions.HTTPError,
+        ),
+        (requests.exceptions.HTTPError, 403, requests.exceptions.HTTPError),
+        (requests.exceptions.Timeout, 403, requests.exceptions.HTTPError),
+        (requests.exceptions.HTTPError, 503, RuntimeError),
+    ],
+)
+def test_get_file_raises_error_on_server_error(
+    mock_get_user_data: Mock, side_effect, status_code, exception
+):
+    # Create a mocked response that will raise on raise_for_status()
+    resp = Mock()
+    resp.status_code = status_code
+    mock_get_user_data.return_value = resp
+    resp.raise_for_status.side_effect = side_effect(response=resp)
+    with pytest.raises(exception):
+        get_file()
+
+
+@pytest.mark.unit
 def test_create_data_frame_raises_on_empty():
     # 1. ARRANGE: Create a MagicMock for the response
     mock_response = MagicMock()
@@ -65,6 +100,7 @@ def test_create_data_frame_raises_on_empty():
         create_data_frame(mock_response)
 
 
+@pytest.mark.unit
 def get_incorrect_headers() -> pd.DataFrame:
     buffer = io.BytesIO()
     data = [
@@ -94,6 +130,7 @@ def get_incorrect_headers() -> pd.DataFrame:
     return df
 
 
+@pytest.mark.unit
 def test_process_data_frame_has_expected_headers():
     # 1. ARRANGE: Create a MagicMock for the response
     mock_response = MagicMock()
@@ -104,6 +141,7 @@ def test_process_data_frame_has_expected_headers():
         process_data_frame(mock_response.data_frame)
 
 
+@pytest.mark.unit
 def test_init_winnings_check_raises_with_missing_area():
     absolute_path = (Path(__file__).parent / mock_data_csv_file_name).resolve()
     print(f"path is {absolute_path.name}")
@@ -116,6 +154,7 @@ def test_init_winnings_check_raises_with_missing_area():
         )
 
 
+@pytest.mark.unit
 def test_init_winnings_check_raises_with_correct_area():
     absolute_path = (Path(__file__).parent / mock_data_csv_file_name).resolve()
     result = init_winnings_check(

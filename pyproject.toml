@@ -18,14 +18,22 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "bandit~=1.9.4",
     "black~=26.5.1",
     "isort~=8.0.1",
+    "mypy~=2.3.0",
+    "pandas-stubs~=3.0.3.260530",
     "pytest~=9.1.1",
     "ruff~=0.16.0",
+    "types-pyyaml~=6.0.12.20260724",
 ]
 
 [tool.pytest.ini_options]
 addopts = "-rA -s -v"
+markers = [
+    "unit: quick unit tests",
+    "resilience: tests resilience of retry logic"
+]
 
 [tool.ruff]
 exclude = [
@@ -60,3 +68,11 @@ line-length = 80
 
 [tool.black]
 line-length = 80
+
+[tool.mypy]
+warn_return_any = true
+warn_unused_configs = true
+warn_no_return = false
+
+[tool.bandit]
+exclude_dirs = [".venv", "__pycache__"]
