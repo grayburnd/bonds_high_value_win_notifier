@@ -6,7 +6,6 @@ on:
      - cron: "0 8 1 * *"
 env:
   uv-version: "0.12.0"
-  UV_SYSTEM_PYTHON: 1
 jobs:
   build_execute:
     runs-on: ubuntu-latest
@@ -25,15 +24,14 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version-file: "pyproject.toml"
-      # You can test your matrix by printing the current Python version
       - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
+        run: uv run python -c "import sys; print(sys.executable); print(sys.version)" ##Since UV is used as a virtual env for this
         
       - name: Install dependencies with uv
-        run: uv sync --locked --all-extras --dev
+        run: uv sync --locked --all-extras --dev ##Since UV is used as a virtual env for this
 
       - name: List pip packages
-        run: pip list
+        run: uv run pip list ##Since UV is used as a virtual env for this
 
       - name: Show env vars
         run: env
@@ -45,7 +43,7 @@ jobs:
           PB_DATE_OF_PURCHASE: ${{ vars.PB_DATE_OF_PURCHASE }}
           PB_AREA: ${{ vars.PB_AREA }}
           LOG_LEVEL: ${{ vars.LOG_LEVEL }}
-        run: python src/main.py
+        run: uv run python src/main.py ##Since UV is used as a virtual env for this
       - name: Upload Results Artifact
         if: ${{ steps.run_python.outputs.CREATE_ARTIFACT == 'True' }}
         uses: actions/upload-artifact@v7
