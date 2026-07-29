@@ -16,12 +16,47 @@ dependencies = [
     "six~=1.17.0",
 ]
 
+[dependency-groups]
+dev = [
+    "black~=26.5.1",
+    "isort~=8.0.1",
+    "pytest~=9.1.1",
+    "ruff~=0.16.0",
+]
 
 [tool.pytest.ini_options]
 addopts = "-rA -s -v"
 
-[dependency-groups]
-dev = [
-    "isort~=8.0.1",
-    "pytest~=9.1.1",
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
 ]
+line-length = 80
+
+[tool.black]
+line-length = 80
