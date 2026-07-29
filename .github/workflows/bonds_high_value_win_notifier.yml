@@ -30,12 +30,6 @@ jobs:
       - name: Install dependencies with uv
         run: uv sync --locked --all-extras --dev ##Since UV is used as a virtual env for this
 
-      - name: List pip packages
-        run: uv run pip list ##Since UV is used as a virtual env for this
-
-      - name: Show env vars
-        run: env
-      
       - name: Run Python
         id: run_python ##Needed for referebce capabilities
         env:
