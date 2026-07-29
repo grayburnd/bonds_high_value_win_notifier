@@ -55,7 +55,9 @@ jobs:
         run: uv run python -c "import sys; print(sys.executable); print(sys.version)" ##Since UV is used as a virtual env for this
       - name: Install dependencies with uv
         run: uv sync --locked --all-extras --dev ##Since UV is used as a virtual env for this
-
+      - name: Run pytest
+        run: |
+          pytest
   execute: ##Seperate to seperate test step afterwards, likely pre merge on a feature branch - DO THIS FINALLY
     runs-on: ubuntu-latest
     outputs:
