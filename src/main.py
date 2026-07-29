@@ -91,7 +91,9 @@ def get_file(max_retries: int = 3):
     }
     month: int = datetime.datetime.now(tz=datetime.UTC).month
     year: int = datetime.datetime.now(tz=datetime.UTC).year
-    excel_url: str = f"https://www.nsandi.com/files/asset/xlsx/prize-{months_dict[month]}-{year}.xlsx"  ##insert current month dynamically
+    excel_url: str = (
+        f"https://www.nsandi.com/files/asset/xlsx/prize-{months_dict[month]}-{year}.xlsx"  ##insert current month dynamically
+    )
     logger.info(
         f"Attempting to download {months_dict[month]}s Premium Bond winngs sheet..."
     )
@@ -252,9 +254,7 @@ def check_if_winner(
 
         assert len(winning_matches_results) < len(
             [holding for holding in csv_dict_reader]
-        ), (
-            f"Winning Matches results is greater than, or equal to, the total winning entries in the {path.name} csv file"
-        )
+        ), f"Winning Matches results is greater than, or equal to, the total winning entries in the {path.name} csv file"
 
         if winning_matches_results:
             message = f"Congratulations, you have {len(winning_matches_results)} potentially matching wins!"
