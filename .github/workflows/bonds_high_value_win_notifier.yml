@@ -7,7 +7,7 @@ on:
 env:
   uv-version: "0.12.0"
 jobs:
-  build_execute:
+  build_execute: ##Seperate to seperate test step afterwards
     runs-on: ubuntu-latest
     outputs:
       results_path: ${{ steps.run_python.outputs.RESULTS_PATH }}
@@ -29,6 +29,12 @@ jobs:
         
       - name: Install dependencies with uv
         run: uv sync --locked --all-extras --dev ##Since UV is used as a virtual env for this
+
+      - name: Format checks
+        run: black --check .
+
+      - name: Linting checks
+        run: ruff check .
 
       - name: Run Python
         id: run_python ##Needed for referebce capabilities
