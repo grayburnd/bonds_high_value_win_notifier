@@ -58,7 +58,7 @@ jobs:
         run: uv sync --locked --all-extras --dev ##Since UV is used as a virtual env for this
       - name: Run pytest
         run: |
-          pytest
+          uv run pytest
 
   execute: ##Seperate to seperate test step afterwards, likely pre merge on a feature branch - DO THIS FINALLY
     needs: tests
