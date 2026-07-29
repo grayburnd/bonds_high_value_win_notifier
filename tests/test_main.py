@@ -1,7 +1,7 @@
 import io
 import logging
 from pathlib import Path
-from unittest.mock import MagicMock, patch, Mock
+from unittest.mock import MagicMock, Mock, patch
 
 import pandas as pd
 import pytest
@@ -11,8 +11,8 @@ from src.main import (
     create_data_frame,
     create_temp_file,
     env_vars_init,
-    init_winnings_check,
     get_file,
+    init_winnings_check,
     process_data_frame,
 )
 
