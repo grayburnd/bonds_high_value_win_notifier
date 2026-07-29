@@ -30,7 +30,7 @@ jobs:
       - name: Linting checks
         run: uv run ruff check .
       - name: Security checks
-        run: bandit -c pyproject.toml -r -ll . ##Only return non-zero exit code for medium and above findings, no config file equivalent
+        run: uv run bandit -c pyproject.toml -r -ll . ##Only return non-zero exit code for medium and above findings, no config file equivalent
       - name: Static type checks
         run: uv run mypy .
 
