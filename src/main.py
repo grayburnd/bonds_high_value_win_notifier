@@ -73,7 +73,7 @@ def get_file(max_retries: int =3):
             response = requests.get(excel_url, timeout=10)
             response.raise_for_status() ##Raise any HTTP Errors as exceptions
             return response
-        except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError) as err:
+        except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as err:
             if err.response is not None and err.response.status_code < 500:
                 msg = f"Failed with client error code {err.response.status_code}. Skipping retry."
                 logger.exception(msg)
@@ -91,10 +91,6 @@ def get_file(max_retries: int =3):
                     logger.critical(f"Got empty response from Server: {err.response}. Retrying in {wait:.2f}s")
                 time.sleep(wait)
                 delay = min(delay * 2, 30)
-        except requests.exceptions.Timeout as err:
-            msg = f"Recieved Timeout error: {err}"
-            logger.critical(msg)
-            raise TimeoutError(msg)
     else:
         msg = f"All {max_retries} attempts failed"
         logger.critical(msg)
@@ -114,7 +110,8 @@ def process_data_frame(data_frame: pd.DataFrame) -> pd.DataFrame:
     data_frame = data_frame.dropna(how="all", axis=1) ##Drop all columns which are empty
     data_frame.columns = [str(col).lower().replace(" ", "_").strip() for col in data_frame.columns] ##Normalize and clean up column names.. remove white spaces, replace spaces with underscores and make lower case
     data_frame["area"] = [str(value).lower().replace("  ", " ").replace(" ", "_").strip() for value in data_frame["area"]] ##Normalize and clean up area names.. remove white spaces, replace spaces with underscores, replace double spaces with single spaces and make lower case
-
+    ##TODO    
+    ##Vectorize the above
     processed_data_frame = data_frame ##Create new var now the DF is processed
 
     expected_column_headers = ["prize_value", "winning_bond_no.", "total_v_of_holding", "area", "val_of_bond", "dt_of_pur"] #Check if headers are in the trimmed down intended headers row, notably data_frame.columns

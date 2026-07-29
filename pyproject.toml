@@ -1,13 +1,27 @@
 [project]
 name = "bonds_high_value_win_notifier" ##Allows pip install bonds_high_value_win_notifier
+description = "A tool to automate downloading NS&I Premium Bonds High Value winners sheets, filter for potential matches based on provided environment variables and notifies via email regarding any potential matching wins"
 version = "0.1.0"
+requires-python = "==3.14.6"
+readme = "README.md"
+maintainers = [
+    { name = "Daniel Grayburn", email = "grayburndan@gmail.com" }
+]
+dependencies = [
+    "openpyxl~=3.1.5",
+    "pandas~=3.0.3",
+    "python-json-logger~=4.1.0",
+    "pyyaml~=6.0.3",
+    "requests~=2.34.2",
+    "six~=1.17.0",
+]
+
 
 [tool.pytest.ini_options]
 addopts = "-rA -s -v"
-markers = [
-    "fast: quick unit tests",
-    "slow: take a long time to run",
-    "api: hit the API",
-    "smoke: quick to run and check basic, critical functionality",
-    "unregistered: used for testing pytest functionality"
+
+[dependency-groups]
+dev = [
+    "isort~=8.0.1",
+    "pytest~=9.1.1",
 ]
