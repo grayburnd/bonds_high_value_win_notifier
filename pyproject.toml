@@ -2,7 +2,7 @@
 name = "bonds_high_value_win_notifier" ##Allows pip install bonds_high_value_win_notifier
 description = "A tool to automate downloading NS&I Premium Bonds High Value winners sheets, filter for potential matches based on provided environment variables and notifies via email regarding any potential matching wins"
 version = "0.1.0"
-requires-python = "==3.14.6"
+requires-python = "~=3.14.6"
 readme = "README.md"
 maintainers = [
     { name = "Daniel Grayburn", email = "grayburndan@gmail.com" }

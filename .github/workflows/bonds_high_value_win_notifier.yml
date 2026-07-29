@@ -5,7 +5,7 @@ on:
   schedule:
      - cron: "0 8 1 * *"
 env:
-  python-version: 3.14
+  uv-version: "0.12.0"
 jobs:
   build_execute:
     runs-on: ubuntu-latest
@@ -15,17 +15,20 @@ jobs:
       create_artifact: ${{ steps.run_python.outputs.CREATE_ARTIFACT }}
     steps:
       - uses: actions/checkout@v7
-      - name: Set up Python ${{ env.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: ${{ env.python-version }}
+          python-version-file: "pyproject.toml"
       # You can test your matrix by printing the current Python version
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          # Install a specific version of uv.
+          version: ${{ env.uv-version }}
+      - name: Install dependencies with uv
+        run: uv sync --locked --all-extras --dev
       - name: Run Python
         id: run_python ##Needed for referebce capabilities
         env:
