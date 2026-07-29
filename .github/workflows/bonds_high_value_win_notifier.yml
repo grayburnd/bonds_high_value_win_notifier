@@ -35,6 +35,7 @@ jobs:
         run: uv run mypy .
 
   tests:
+    needs: linting-and-checks
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -58,7 +59,9 @@ jobs:
       - name: Run pytest
         run: |
           pytest
+
   execute: ##Seperate to seperate test step afterwards, likely pre merge on a feature branch - DO THIS FINALLY
+    needs: tests
     runs-on: ubuntu-latest
     outputs:
       results_path: ${{ steps.run_python.outputs.RESULTS_PATH }}
