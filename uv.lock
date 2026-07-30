@@ -1,10 +1,13 @@
 version = 1
 revision = 3
-requires-python = ">=3.14.6, <3.15"
+requires-python = ">=3.14, <4"
 resolution-markers = [
-    "sys_platform == 'win32'",
-    "sys_platform == 'emscripten'",
-    "sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version >= '3.15' and sys_platform == 'win32'",
+    "python_full_version < '3.15' and sys_platform == 'win32'",
+    "python_full_version >= '3.15' and sys_platform == 'emscripten'",
+    "python_full_version < '3.15' and sys_platform == 'emscripten'",
+    "python_full_version >= '3.15' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "python_full_version < '3.15' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 
 [[package]]
@@ -112,24 +115,24 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "openpyxl", specifier = "~=3.1.5" },
-    { name = "pandas", specifier = "~=3.0.3" },
-    { name = "python-json-logger", specifier = "~=4.1.0" },
-    { name = "pyyaml", specifier = "~=6.0.3" },
-    { name = "requests", specifier = "~=2.34.2" },
-    { name = "six", specifier = "~=1.17.0" },
+    { name = "openpyxl", specifier = "~=3.1" },
+    { name = "pandas", specifier = "~=3.0" },
+    { name = "python-json-logger", specifier = "~=4.1" },
+    { name = "pyyaml", specifier = "~=6.0" },
+    { name = "requests", specifier = "~=2.34" },
+    { name = "six", specifier = "~=1.17" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "bandit", specifier = "~=1.9.4" },
-    { name = "black", specifier = "~=26.5.1" },
-    { name = "isort", specifier = "~=8.0.1" },
-    { name = "mypy", specifier = "~=2.3.0" },
-    { name = "pandas-stubs", specifier = "~=3.0.3.260530" },
-    { name = "pytest", specifier = "~=9.1.1" },
-    { name = "ruff", specifier = "~=0.16.0" },
-    { name = "types-pyyaml", specifier = "~=6.0.12.20260724" },
+    { name = "bandit", specifier = "~=1.9" },
+    { name = "black", specifier = "~=26.5" },
+    { name = "isort", specifier = "~=8.0" },
+    { name = "mypy", specifier = "~=2.3" },
+    { name = "pandas-stubs", specifier = "~=3.0" },
+    { name = "pytest", specifier = "~=9.1" },
+    { name = "ruff", specifier = "~=0.16" },
+    { name = "types-pyyaml", specifier = "~=6.0" },
 ]
 
 [[package]]
