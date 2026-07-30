@@ -53,8 +53,6 @@ uv add --dev pytest
 uv sync --dev
 ```
 
-Using pip/venv (alternative)
-
 Environment variables
 
 Set the following environment variables before running (these are required):
