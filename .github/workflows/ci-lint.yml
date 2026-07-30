@@ -1,4 +1,4 @@
-name: CI Lint
+name: CI Lint (Callable ONLY)
 
 on:
   workflow_call:
