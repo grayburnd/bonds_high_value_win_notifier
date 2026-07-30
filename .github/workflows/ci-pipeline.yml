@@ -8,6 +8,7 @@ jobs:
     with:
       uv-version: "0.12.0"
   call-test:
+    needs: call-lint
     uses: grayburnd/bonds_high_value_win_notifier/.github/workflows/ci-test.yml@main
     with:
       uv-version: "0.12.0"

@@ -8,7 +8,7 @@ on:
         type: string
 
 jobs:
-  linting-and-checks:
+  ci-lint-and-checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
