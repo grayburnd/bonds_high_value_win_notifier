@@ -1,6 +1,6 @@
 name: bonds_high_value_win_notifier
-
-on: 
+## Get a git leaks step in here too
+on:
   workflow_dispatch:
   schedule:
      - cron: "0 8 1 * *"
@@ -8,60 +8,8 @@ env:
   uv-version: "0.12.0"
 
 jobs:
-  linting-and-checks:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: Install uv
-        uses: astral-sh/setup-uv@v9.0.0
-        with:
-          # Install a specific version of uv.
-          version: ${{ env.uv-version }}
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version-file: "pyproject.toml"
-      - name: Display Python version
-        run: uv run python -c "import sys; print(sys.executable); print(sys.version)" ##Since UV is used as a virtual env for this
-      - name: Install dependencies with uv
-        run: uv sync --locked --all-extras --dev ##Since UV is used as a virtual env for this
-      - name: Format checks
-        run: uv run black --check .
-      - name: Linting checks
-        run: uv run ruff check .
-      - name: Security checks
-        run: uv run bandit -c pyproject.toml -r -ll . ##Only return non-zero exit code for medium and above findings, no config file equivalent
-      - name: Static type checks
-        run: uv run mypy .
-
-  tests:
-    needs: linting-and-checks
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.12", "3.13", "3.14"]
-    steps:
-      - uses: actions/checkout@v7
-      - name: Install uv
-        uses: astral-sh/setup-uv@v9.0.0
-        with:
-          # Install a specific version of uv.
-          version: ${{ env.uv-version }}
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Display Python version
-        run: uv run python -c "import sys; print(sys.executable); print(sys.version)" ##Since UV is used as a virtual env for this
-      - name: Install dependencies with uv
-        run: uv sync --locked --all-extras --dev ##Since UV is used as a virtual env for this
-      - name: Run pytest
-        run: |
-          uv run pytest
 
   execute: ##Seperate to seperate test step afterwards, likely pre merge on a feature branch - DO THIS FINALLY
-    needs: tests
     runs-on: ubuntu-latest
     outputs:
       results_path: ${{ steps.run_python.outputs.RESULTS_PATH }}
@@ -102,9 +50,9 @@ jobs:
     needs: execute
     runs-on: ubuntu-latest
     env:
-      message: ${{ needs.build_execute.outputs.message }}
-      results_path: ${{ needs.build_execute.outputs.results_path }} ##Defaults to False if Upload Results Artifact is not ran, as per condition for RESULTS_PATH
-      create_artifact: ${{ needs.build_execute.outputs.create_artifact }} ##Defaults to False if Upload Results Artifact is not ran, as per condition for CREATE_ARTIFACT
+      message: ${{ needs.execute.outputs.message }}
+      results_path: ${{ needs.execute.outputs.results_path }} ##Defaults to False if Upload Results Artifact is not ran, as per condition for RESULTS_PATH
+      create_artifact: ${{ needs.execute.outputs.create_artifact }} ##Defaults to False if Upload Results Artifact is not ran, as per condition for CREATE_ARTIFACT
     steps:
       - uses: actions/download-artifact@v7
         if: ${{ env.create_artifact == 'True' }}
@@ -116,19 +64,19 @@ jobs:
           # MailerSend Server specs
           server_address: ${{ vars.MAIL_ADDRESS }}
           server_port: ${{ vars.SERVER_PORT }}
-          
+
           # Authentication
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
-          
+
           ## Email Routing Info
           subject: "Premium Bonds: High Value Winnings Monthly Filter Results"
-          to: ${{ vars.MAIL_TO }} 
+          to: ${{ vars.MAIL_TO }}
           from: ${{ vars.MAIL_FROM }}
 
           ## Attachments - Defaults to empty in case results path is Falsey
           attachments: ${{ env.results_path || '[]' }}
-          
+
           ##Message Body
 
           body: | ##Multi-Line string reminder

@@ -1,0 +1,12 @@
+name: CI Pipeline
+on:
+  pull_request:
+jobs:
+  call-lint:
+    uses: grayburnd/bonds_high_value_win_notifier/.github/workflows/ci-lint.yml@main
+    with:
+      uv-version: "0.12.0"
+  call-test:
+    uses: grayburnd/bonds_high_value_win_notifier/.github/workflows/ci-test.yml@main
+    with:
+      uv-version: "0.12.0"

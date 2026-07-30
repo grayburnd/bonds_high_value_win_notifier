@@ -1,0 +1,34 @@
+name: CI Test
+
+on:
+  workflow_call:
+    inputs:
+      uv-version:
+        required: true
+        type: string
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          # Install a specific version of uv.
+          version: ${{ inputs.uv-version }}
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Display Python version
+        run: uv run python -c "import sys; print(sys.executable); print(sys.version)" ##Since UV is used as a virtual env for this
+      - name: Install dependencies with uv
+        run: uv sync --locked --all-extras --dev ##Since UV is used as a virtual env for this
+      - name: Run pytest
+        run: |
+          uv run pytest
