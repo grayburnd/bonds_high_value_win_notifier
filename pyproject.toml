@@ -84,3 +84,7 @@ warn_no_return = false
 
 [tool.bandit]
 exclude_dirs = [".venv", "__pycache__"]
+
+[tool.isort]
+profile = "black"
+line_length = 80
