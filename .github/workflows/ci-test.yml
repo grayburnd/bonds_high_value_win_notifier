@@ -1,4 +1,4 @@
-name: CI Test (Callable ONLY)
+name: CI [Test] (Callable ONLY)
 
 on:
   workflow_call:
