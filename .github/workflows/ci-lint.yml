@@ -36,5 +36,9 @@ jobs:
       - name: Security checks
         run: uv run bandit -c pyproject.toml -r -ll . ##Only return non-zero exit code for medium and above findings, no config file equivalent
 
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Static type checks
         run: uv run mypy .
