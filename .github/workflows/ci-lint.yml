@@ -9,7 +9,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read ##GitLeaks required
+  pull-requests: read ##GitLeaks required.
 
 jobs:
   ci-lint-and-checks:
