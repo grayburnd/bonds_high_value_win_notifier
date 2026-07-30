@@ -21,6 +21,7 @@ jobs:
         with:
           # Install a specific version of uv.
           version: ${{ inputs.uv-version }}
+          enable-cache: true
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
