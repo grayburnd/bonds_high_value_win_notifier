@@ -55,15 +55,6 @@ uv sync --dev
 
 Using pip/venv (alternative)
 
-If you prefer a standard `venv` + `pip` workflow, you can still use it:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -U pip
-pip install -e .[dev]
-```
-
 Environment variables
 
 Set the following environment variables before running (these are required):
@@ -128,11 +119,3 @@ Suggested contribution flow:
 ## Security and reporting
 
 If you discover a security vulnerability, please open an issue and mark it as security-sensitive. Do not publish secrets in issues.
-
-## License
-
-See the `LICENSE` file in the repository for license details.
-
----
-
-If you'd like, I can also add a minimal `CONTRIBUTING.md` and a GitHub Actions workflow to run tests on PRs.
