@@ -68,7 +68,7 @@ def create_temp_file():
     ) as temp_file:
         path = Path(temp_file.name)
 
-        logger.info(f"Placed Premium Bond Winnings Excel sheet at {path}.")
+        logger.info(f"Placed temp file at {path}.")
 
         return path
 
