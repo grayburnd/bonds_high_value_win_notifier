@@ -3,7 +3,7 @@ name: bonds_high_value_win_notifier
 on:
   workflow_dispatch:
   schedule:
-     - cron: "0 8 1 * *"
+     - cron: "0 8 1,2,3,4 * *"
 env:
   uv-version: "0.12.0"
 
