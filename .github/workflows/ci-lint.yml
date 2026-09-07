@@ -14,23 +14,20 @@ jobs:
   ci-lint-and-checks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout local Git Repo
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
+
       - name: Install uv
         uses: astral-sh/setup-uv@v9.0.0
         with:
           # Install a specific version of uv.
           version: ${{ inputs.uv-version }}
           enable-cache: true
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version-file: "pyproject.toml"
-      - name: Display Python version
-        run: uv run python -c "import sys; print(sys.executable); print(sys.version)" ##Since UV is used as a virtual env for this
+
       - name: Install dependencies with uv
-        run: uv sync --locked --all-extras --dev ##Since UV is used as a virtual env for this
+        run: uv sync --frozen --all-groups
 
       - name: Format checks
         run: uv run black --check .
@@ -41,7 +38,7 @@ jobs:
       - name: Security checks
         run: uv run bandit -c pyproject.toml -r -ll . ##Only return non-zero exit code for medium and above findings, no config file equivalent
 
-      - uses: gitleaks/gitleaks-action@v3
+      - uses: gitleaks/gitleaks-action@v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

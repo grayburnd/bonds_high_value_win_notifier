@@ -1,11 +1,11 @@
 name: bonds_high_value_win_notifier
-## Get a git leaks step in here too
+## Need to make sure only runs on specified working days which is 2nd business day of month.
 on:
   workflow_dispatch:
   schedule:
      - cron: "0 8 1,2,3,4 * *"
 env:
-  uv-version: "0.12.0"
+  uv-version: "0.12.1"
 
 jobs:
 
@@ -15,37 +15,41 @@ jobs:
       results_path: ${{ steps.run_python.outputs.RESULTS_PATH }}
       message: ${{ steps.run_python.outputs.MESSAGE }}
       create_artifact: ${{ steps.run_python.outputs.CREATE_ARTIFACT }}
+
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout local Git Repo
+        uses: actions/checkout@v7.0.1
+
       - name: Install uv
         uses: astral-sh/setup-uv@v9.0.0
         with:
           # Install a specific version of uv.
           version: ${{ env.uv-version }}
           enable-cache: true
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version-file: "pyproject.toml"
-      - name: Display Python version
-        run: uv run python -c "import sys; print(sys.executable); print(sys.version)" ##Since UV is used as a virtual env for this\
+
       - name: Install dependencies with uv
-        run: uv sync --locked --all-extras ##--dev : Dont include dev dependencies in the live run
+        run: uv sync --frozen
+
       - name: Run Python
-        id: run_python ##Needed for referebce capabilities
+        id: run_python ##Needed for reference capabilities
         env:
           PB_VAL_OF_BOND: ${{ vars.PB_VAL_OF_BOND }}
           PB_DATE_OF_PURCHASE: ${{ vars.PB_DATE_OF_PURCHASE }}
           PB_AREA: ${{ vars.PB_AREA }}
           LOG_LEVEL: ${{ vars.LOG_LEVEL }}
-        run: uv run python src/main.py ##Since UV is used as a virtual env for this
+        run: uv run python src/main.py
+
       - name: Upload Results Artifact
         if: ${{ steps.run_python.outputs.CREATE_ARTIFACT == 'True' }}
         uses: actions/upload-artifact@v7
         with:
           name: winnings-results
           path: ${{ steps.run_python.outputs.RESULTS_PATH }}
-
 
   notify_if_win:
     needs: execute
@@ -55,10 +59,12 @@ jobs:
       results_path: ${{ needs.execute.outputs.results_path }} ##Defaults to False if Upload Results Artifact is not ran, as per condition for RESULTS_PATH
       create_artifact: ${{ needs.execute.outputs.create_artifact }} ##Defaults to False if Upload Results Artifact is not ran, as per condition for CREATE_ARTIFACT
     steps:
-      - uses: actions/download-artifact@v7
+      - name: Download Winning results
+        uses: actions/download-artifact@v7
         if: ${{ env.create_artifact == 'True' }}
         with:
           name: winnings-results
+
       - name: Send mail
         uses: dawidd6/action-send-mail@v18
         with:
