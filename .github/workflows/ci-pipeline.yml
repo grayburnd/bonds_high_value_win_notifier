@@ -4,11 +4,11 @@ on:
   pull_request:
 jobs:
   call-lint:
-    uses: grayburnd/bonds_high_value_win_notifier/.github/workflows/ci-lint.yml@main
+    uses: $/.github/workflows/ci-lint.yml
     with:
-      uv-version: "0.12.0"
+      uv-version: "0.12.1"
   call-test:
     needs: call-lint
-    uses: grayburnd/bonds_high_value_win_notifier/.github/workflows/ci-test.yml@main
+    uses: $/.github/workflows/ci-test.yml
     with:
-      uv-version: "0.12.0"
+      uv-version: "0.12.1"
