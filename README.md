@@ -1,119 +1,126 @@
-# bonds_high_value_win_notifier
+# Premium Bonds High Value Win Notifier
+[![Python 3.14+](https://img.shields.io/badge/python-3.14%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 
-A small utility to download the NS&I Premium Bonds monthly winners sheet, filter it for potential matches based on your Premium Bonds holdings, and notify you when there are possible winning bonds.
+This Python utility downloads the current month’s NS&I Premium Bonds high-value winners workbook and checks it for potential matches against a holding. It is designed to run locally or as a scheduled GitHub Actions workflow.
 
-Version: 0.1.0
+## Why use it
 
-**Quick summary**
-- Downloads the monthly Premium Bonds winners Excel file from NS&I
-- Normalises and scans the sheet for area, purchase date and bond value matches
-- Emits results suitable for local use or GitHub Actions artifact creation
+- Avoids manually searching the monthly winners workbook.
+- Normalizes area names and uses fuzzy matching for the area input.
+- Filters potential matches by area, purchase date, and bond value.
+- Retries transient download failures with a timeout, exponential backoff, and jitter.
+- Produces a JSON results file and ZIP artifact in GitHub Actions; the workflow can email the result.
 
-**Badges**
-- Python: >=3.14 (see `pyproject.toml`)
+The tool identifies potential matches only. Confirm any result with NS&I before treating it as a win.
 
-## What the project does
+## Requirements
 
-This tool automates the process of checking the NS&I Premium Bonds monthly winners list for potential matches against your holdings. It:
+- Python 3.14 or newer
+- `uv` for the documented setup commands
+- Network access to download the workbook from [NS&I](https://www.nsandi.com/prize-checker)
 
-- Downloads the current month winners Excel file
-- Converts and normalises the sheet into CSV
-- Finds the closest area matches and filters by purchase date and bond value
-- Writes results and (when run in GitHub Actions) produces an artifact
+## Installation
 
-The main entrypoint is `src/main.py`.
-
-## Why this project is useful
-
-- Saves time manually scanning large winners lists
-- Makes it easy to integrate checks into CI/CD pipelines (GitHub Actions compatibility via `GITHUB_OUTPUT` handling)
-- Lightweight and easy to run locally or in a scheduled runner
-
-## Getting started
-
-Prerequisites
-
-- Python 3.14 or later
-
-Using `uv` (recommended)
-
-This project supports `uv` for dependency management. Example workflow:
+Clone the repository and install the locked runtime and development dependencies:
 
 ```bash
-# create or activate your uv environment (if you use uv's environment features)
-uv init    # optional: initialise uv in the repo if not already
-
-# add runtime dependencies from pyproject
-uv sync
-
-# add a development dependency
-uv add --dev pytest
-
-# install everything declared (runtime + dev as configured)
-uv sync --dev
+git clone https://github.com/grayburnd/bonds_high_value_win_notifier.git
+cd bonds_high_value_win_notifier
+uv sync --frozen --all-groups
 ```
 
-Environment variables
+The committed `uv.lock` keeps dependency resolution reproducible. To install only the runtime dependencies, use `uv sync --frozen`.
 
-Set the following environment variables before running (these are required):
+## Configuration
 
-- `PB_AREA` — area string to match (e.g. `london`)
-- `PB_DATE_OF_PURCHASE` — purchase date in `YYYY-MM-DD` format
-- `PB_VAL_OF_BOND` — bond face value (e.g. `25000`)
+The local entrypoint requires these environment variables. Values are treated as strings, so preserve the date and bond value formats used in the NS&I data.
 
-Optional:
+| Variable | Required | Description | Example |
+| --- | --- | --- | --- |
+| `PB_AREA` | Yes | Area to match. Matching is case-insensitive, spaces are normalized to underscores, and the three closest data values are considered. | `london` |
+| `PB_DATE_OF_PURCHASE` | Yes | Exact purchase date to match. Use the workbook format `YYYY-MM-DD`. | `2024-02-26` |
+| `PB_VAL_OF_BOND` | Yes | Exact bond value to match. | `25000` |
+| `LOG_LEVEL` | No | Console log level. Defaults to `DEBUG`. | `INFO` |
 
-- `LOG_LEVEL` — logging level (default `DEBUG`)
-
-Example (run locally):
+Run it locally with:
 
 ```bash
-export PB_AREA="london"
-export PB_DATE_OF_PURCHASE="2024-02-26"
-export PB_VAL_OF_BOND="25000"
-export LOG_LEVEL=INFO
-python -m src.main
+PB_AREA=london \
+PB_DATE_OF_PURCHASE=2024-02-26 \
+PB_VAL_OF_BOND=25000 \
+LOG_LEVEL=INFO \
+uv run python src/main.py
 ```
 
-Notes
+The program downloads the workbook for the current UTC month. It does not send email during a normal local run; the match count is logged and temporary processing files are removed when the run completes. The detailed JSON result is retained as a ZIP artifact only when `GITHUB_OUTPUT` is available in GitHub Actions.
 
-- The script expects to fetch the winners Excel from NS&I. Ensure network access is available.
-- When run on GitHub Actions, the script writes `RESULTS_PATH`, `MESSAGE` and `CREATE_ARTIFACT` to the `GITHUB_OUTPUT` file so workflows can pick up artifacts.
+## GitHub Actions
+
+The workflow in `.github/workflows/job.yml` can be started manually or runs at 08:00 UTC on days 1 through 4 of each month. It runs the same script, uploads a `winnings-results` artifact when there are matches, and uses `dawidd6/action-send-mail` to send the outcome.
+
+Configure these repository-level Actions variables:
+
+| Variable | Description |
+| --- | --- |
+| `PB_AREA` | Area used for matching. |
+| `PB_DATE_OF_PURCHASE` | Exact purchase date in `YYYY-MM-DD` format. |
+| `PB_VAL_OF_BOND` | Exact bond value. |
+| `LOG_LEVEL` | Optional log level; defaults to `DEBUG`. |
+| `MAIL_ADDRESS` | SMTP server hostname. |
+| `SERVER_PORT` | SMTP server port. |
+| `MAIL_TO` | Recipient address. |
+| `MAIL_FROM` | Sender address. |
+
+Configure these repository secrets:
+
+- `MAIL_USERNAME` — SMTP username.
+- `MAIL_PASSWORD` — SMTP password.
+
+The workflow writes `MESSAGE`, `RESULTS_PATH`, and `CREATE_ARTIFACT` through GitHub’s `GITHUB_OUTPUT` mechanism. Do not put SMTP credentials or other secrets in variables, source files, issues, or logs.
+
+## Development
+
+Run the tests:
+
+```bash
+uv run pytest
+```
+
+Before opening a pull request, run the same checks used by CI:
+
+```bash
+uv run black --check .
+uv run ruff check .
+uv run bandit -c pyproject.toml -r -ll .
+uv run mypy .
+uv run pytest
+```
+
+Pre-commit hooks are configured in `.pre-commit-config.yaml` and include formatting, linting, YAML/TOML checks, large-file checks, and secret scanning with Gitleaks. Dependabot checks the `uv` dependencies weekly.
+
+## Engineering practices
+
+- **Reproducible dependencies:** runtime and development requirements are declared in `pyproject.toml` and pinned through `uv.lock`.
+- **Input and data validation:** required environment variables are checked before work starts; empty downloads and missing workbook columns fail explicitly.
+- **Resilient network access:** requests use a ten-second timeout, client errors are not retried, and transient failures use bounded exponential backoff with jitter.
+- **Temporary-file hygiene:** intermediate CSV and JSON files are created with secure temporary-file APIs and removed during cleanup.
+- **Structured observability:** YAML-configured JSON logs include timestamps and levels, with `LOG_LEVEL` available for runtime control.
+- **Automated quality gates:** CI runs Black, Ruff, Bandit, Gitleaks, mypy, and pytest on pull requests.
 
 ## Project layout
 
-- `pyproject.toml` — project metadata and dependencies
-- `src/main.py` — main application logic
-- `logging/declarative-config.yaml` — logging configuration
-- `tests/` — unit and resilience tests
-- `tests/mock_data_frame.csv` — example CSV used by tests
+- `src/main.py` — download, normalization, matching, artifact, and cleanup logic.
+- `tests/` — unit and retry/resilience tests with representative CSV and workbook data.
+- `logging/declarative-config.yaml` — JSON console logging configuration.
+- `.github/workflows/` — pull-request checks and the scheduled notification workflow.
+- `pyproject.toml` and `uv.lock` — project metadata, tool configuration, and locked dependencies.
 
-## Testing
+## Help and contributions
 
-Run the test suite with `pytest` (project uses `pytest` for unit and resilience tests):
+For usage questions or reproducible bugs, [open an issue](https://github.com/grayburnd/bonds_high_value_win_notifier/issues) with the command, relevant non-sensitive configuration details, and logs. For security concerns, avoid publishing credentials or other sensitive data in an issue.
 
-```bash
-pytest -q
-```
+Contributions are welcome through pull requests. Please keep changes focused, add or update tests for behavior changes, update this README when setup or configuration changes, and run the local CI checks before submitting. The project is maintained by [Daniel Grayburn](https://github.com/grayburnd).
 
-## Where to get help
+## License
 
-- Open an issue on this repository with a clear description of the problem and steps to reproduce.
-- For questions about running the project locally, open a discussion or issue.
-
-## Who maintains and how to contribute
-
-Maintainer: Daniel Grayburn <grayburndan@gmail.com>
-
-Contributions are welcome via pull requests. Keep contributions focused and include tests for new behavior. If you plan larger changes, open an issue first to discuss the design.
-
-Suggested contribution flow:
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests and update documentation
-4. Open a pull request
-
-## Security and reporting
-
-If you discover a security vulnerability, please open an issue and mark it as security-sensitive. Do not publish secrets in issues.
+No license file is currently included in the repository. Contact the maintainer before redistributing or reusing the code.
